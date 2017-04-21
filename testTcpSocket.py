@@ -1,0 +1,36 @@
+# !/bin/usr/env python3
+# -*- coding: utf-8 -*-
+
+"""
+test tcp socket connect sina home
+"""
+
+__author__="eric"
+
+
+import socket
+
+
+def test(addr, p):
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((addr, p))
+        s.send(b'GET / HTTP/1.1\r\nHost: www.sina.com.cn\r\nConnection: close\r\n\r\n')
+        buffer = []
+        while True:
+            d = s.recv(1024)
+            if d:
+                buffer.append(d)
+            else:
+                break;
+        data = b''.join(buffer)
+        header, html = data.split(b'\r\n\r\n', 1)
+        print(header.decode('utf-8'))
+        with open('sina.html', 'wb') as f:
+            f.write(html)
+    finally:
+        s.close()
+
+
+if __name__ == "__main__":
+    test("www.sina.com.cn", 80)
